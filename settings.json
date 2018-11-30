@@ -1,0 +1,5 @@
+{
+    "python.jediEnabled": false,
+    "python.pythonPath": "C:\\Users\\Servicios ISOCA\\Anaconda3\\python.exe",
+    "python.linting.pylintEnabled": true
+}
