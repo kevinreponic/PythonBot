@@ -53,6 +53,25 @@ class InstagramBot:
                 follower_username = driver.find_element_by_xpath("/html/body/span/section/main/div/header/section/div[1]/h1").get_attribute('innerHTML')
                 follower_name = driver.find_element_by_xpath("/html/body/span/section/main/div/header/section/div[2]/h1").get_attribute('innerHTML')
                 follower_bio = driver.find_element_by_xpath("/html/body/span/section/main/div/header/section/div[2]/span").get_attribute('innerHTML')
+                time.sleep(2)
+                follower_counter = driver.find_element_by_xpath("/html/body/span/section/main/div/header/section/ul/li[2]/a/span").get_attribute('innerHTML')
+                fof_button = driver.find_element_by_xpath("/html/body/span/section/main/div/header/section/ul/li[2]/a")
+                fof_button.click()
+                time.sleep(2)
+                for i in range(1,10):
+                    fof_window= driver.find_elements_by_xpath("/html/body/div[3]/div/div/div[2]/ul/div/li")[-1]
+                    fof_window.location_once_scrolled_into_view
+                    time.sleep(2)
+                if int(follower_counter) > 7 :
+                    fofs = driver.find_elements_by_xpath("/html/body/div[3]/div/div/div[2]/ul/div/li/div/div[1]/div[2]/div[1]/a")
+                else :
+                    fofs = driver.find_elements_by_xpath("/html/body/div[3]/div/div/div[2]/ul/div/li/div/div[2]/div[1]/div/div/a")
+                                                      
+                fofs_hrefs = [elem.get_attribute('href') for elem in fofs]
+                print(fofs_hrefs)
+                driver.find_element_by_xpath('/html/body/div[3]/div/div/div[1]/div/div[2]/button').click()
+                time.sleep(2)
+                
                 for i in range (1, 5) :  
                  driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                  time.sleep(2)
@@ -81,7 +100,43 @@ class InstagramBot:
                     }
                     db.reference('/users/testreponic123/followers/'+push_key+'/photos/feed/').push(photo)
                     time.sleep(3)
-                
+                for fof_href in fofs_hrefs : 
+                    driver.get(fof_href)
+                    time.sleep(2)
+                    try:
+                     fof_username = driver.find_element_by_xpath("/html/body/span/section/main/div/header/section/div[1]/h1").get_attribute('innerHTML')
+                     fof_name = driver.find_element_by_xpath("/html/body/span/section/main/div/header/section/div[2]/h1").get_attribute('innerHTML')
+                     fof_bio = driver.find_element_by_xpath("/html/body/span/section/main/div/header/section/div[2]/span").get_attribute('innerHTML')
+                     fof = {
+                        'username' : fof_username,
+                        'name' : fof_name,
+                        'bio' : fof_bio
+                     }
+                     fof_push = db.reference('users/testreponic123/followers/'+push_key+'/followers').push(fof)
+                     time.sleep(2)
+                     push_key_2= fof_push.key
+                     for i in range (1, 5) :  
+                      driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                      time.sleep(2)
+                     fof_photos = driver.find_elements_by_xpath("/html/body/span/section/main/div/div/article/div/div/div/div/a")
+                     fof_photos_hrefs = [elem.get_attribute("href") for elem in fof_photos]
+                     for fof_photo_href in fof_photos_hrefs :
+                      driver.get(fof_photo_href)
+                      time.sleep(2)
+                      fof_photo_likes = driver.find_element_by_xpath('/html/body/span/section/main/div/div/article/div[2]/section[2]/div/div/a/span').get_attribute('innerHTML')
+                      fof_photo_caption = driver.find_element_by_xpath('/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li[1]/div/div/div/div/span').get_attribute('innerHTML')
+                      fof_comments_elements = driver.find_elements_by_xpath('/html/body/span/section/main/div/div/article/div[2]/div[1]/ul/li/div/div/div/div/span')
+                      fof_photo_comments = [elem.get_attribute('innerHTML') for elem in fof_comments_elements]
+                      fof_photo = {
+                        'likes' : fof_photo_likes,
+                        'caption' : fof_photo_caption,
+                        'comments' : fof_photo_comments
+                         }
+                      db.reference('/users/testreponic123/followers/'+push_key+'/followers/'+push_key_2+'/photos/feed').push(fof_photo)
+                      time.sleep(3)
+                    except Exception as e:
+                        print(e)
+                        time.sleep(3)
                 time.sleep(10)
             except Exception as e:
                 print(e)
