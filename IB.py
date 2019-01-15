@@ -29,19 +29,20 @@ class InstagramBot:
         password_elem.send_keys(Keys.RETURN)
         time.sleep(4)
     
-    def like_photo(self, hashtag) :
+    def like_photo(self, hashtags) :
         driver = self.driver
-        driver.get("https://www.instagram.com/explore/tags/"+hashtag+"/")
-        time.sleep(2)
-        for i in range (1, 3):
+        for hashtag in hashtags:      
+         driver.get("https://www.instagram.com/explore/tags/"+hashtag+"/")
+         time.sleep(2)
+         for i in range (1, 5):
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
 
-        hrefs = driver.find_elements_by_tag_name('a')
-        pic_hrefs = [elem.get_attribute('href') for elem in hrefs]
-        print(hashtag + ' photos: '+str(len(pic_hrefs)))
+         hrefs = driver.find_elements_by_xpath('/html/body/span/section/main/article/div/div/div/div/div/a')
+         pic_hrefs = [elem.get_attribute('href') for elem in hrefs]
+         print(hashtag + ' photos: '+str(len(pic_hrefs)))
 
-        for pic_href in pic_hrefs:
+         for pic_href in pic_hrefs:
             driver.get(pic_href)
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             try:
@@ -56,5 +57,5 @@ class InstagramBot:
 
 kevinIG = InstagramBot("testreponic123", 'Test123')
 kevinIG.login()
-kevinIG.like_photo("paris")
+kevinIG.like_photo(["test1234567890", "test123test"])
 kevinIG.closeBrowser()
